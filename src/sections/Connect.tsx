@@ -130,7 +130,7 @@ function Comet({ d }: { d: string }) {
         animate={{ pathLength: 1, opacity: [1, 1, 0.35] }}
         transition={{ pathLength: { duration: 0.9, ease: [0.45, 0, 0.2, 1] }, opacity: { duration: 2.4, times: [0, 0.5, 1] } }}
       />
-      <circle ref={dotRef} r={1.3} fill="#fff" style={{ filter: 'drop-shadow(0 0 3px #D7361F)' }} />
+      <circle ref={dotRef} r={1.4} fill="#D7361F" stroke="#fff" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
     </g>
   )
 }
@@ -161,19 +161,15 @@ function Stage() {
   return (
     <div ref={ref} className="relative mx-auto w-full max-w-[900px]" style={{ aspectRatio: `${L.w} / ${L.h}` }}>
       <div
-        className="pointer-events-none absolute top-1/2 left-1/2 aspect-square w-[70%] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{ background: 'radial-gradient(closest-side, rgb(215 54 31 / 0.28), transparent)' }}
-      />
-      <div
-        className="pointer-events-none absolute top-1/2 left-1/2 aspect-square w-[58%] rounded-full border border-dashed border-white/10"
+        className="pointer-events-none absolute top-1/2 left-1/2 aspect-square w-[58%] rounded-full border border-dashed border-ink/12"
         style={{ translate: '-50% -50%', animation: 'spin-slow 80s linear infinite' }}
       />
 
       <svg viewBox={`0 0 ${L.w} ${L.h}`} className="absolute inset-0 size-full overflow-visible" aria-hidden>
         {paths.map((d, i) => (
           <g key={d}>
-            <path d={d} fill="none" stroke="white" strokeOpacity={0.14} strokeWidth={1} vectorEffect="non-scaling-stroke" />
-            <circle r={0.7} fill="white" opacity={0.55}>
+            <path d={d} fill="none" stroke="#111" strokeOpacity={0.12} strokeWidth={1} vectorEffect="non-scaling-stroke" />
+            <circle r={0.7} fill="#111" opacity={0.3}>
               <animateMotion dur="3.2s" repeatCount="indefinite" begin={`${i * 0.53}s`} path={d} />
             </circle>
           </g>
@@ -203,14 +199,14 @@ function Stage() {
           {delivered >= 0 && (
             <motion.div
               key={delivered}
-              className="flex items-center gap-3 rounded-2xl bg-white p-3 pr-4 shadow-[0_20px_40px_-12px_rgb(0_0_0/0.6)]"
+              className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 pr-4 shadow-card"
               initial={{ opacity: 0, y: -18, scale: 0.94 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96, transition: { duration: 0.18 } }}
               transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             >
               <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface">
-                <img src={ais[delivered].logo} alt="" className="size-5" />
+                <img src={ais[delivered].logo} alt="" className="size-5 brightness-0" />
               </span>
               <span className="min-w-0 text-[13px] leading-tight">
                 <span className="flex items-center justify-between font-semibold text-ink">
@@ -252,16 +248,16 @@ function Stage() {
                 animate={{
                   scale: on ? 1.08 : 1,
                   boxShadow: on
-                    ? '0 0 0 3px rgba(215,54,31,0.9), 0 0 50px 4px rgba(215,54,31,0.55)'
-                    : '0 0 0 0px rgba(215,54,31,0), 0 10px 30px -8px rgba(0,0,0,0.6)',
+                    ? '0 0 0 2px rgba(215,54,31,1), 0 18px 36px -16px rgba(17,17,17,0.35)'
+                    : '0 0 0 1px rgba(17,17,17,0.08), 0 14px 30px -16px rgba(17,17,17,0.28)',
                 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 18 }}
               >
-                <img src={ai.logo} alt={ai.name} className="w-[52%]" />
+                <img src={ai.logo} alt={ai.name} className="w-[52%] brightness-0" />
               </motion.div>
               <span
                 className={`absolute top-full left-1/2 mt-2 -translate-x-1/2 text-[11px] whitespace-nowrap transition-colors md:text-[12.5px] ${
-                  on ? 'text-white' : 'text-white/45'
+                  on ? 'text-ink' : 'text-faint'
                 }`}
               >
                 {ai.name}
@@ -282,7 +278,7 @@ const steps = [
 
 export function Connect() {
   return (
-    <section id="connect" className="relative overflow-hidden bg-night py-24 text-white md:py-36">
+    <section id="connect" className="relative overflow-hidden py-20 md:py-36">
       <div className="container-page">
         <div className="mx-auto max-w-[46rem] text-center">
           <Headline
@@ -290,7 +286,7 @@ export function Connect() {
             className="text-[clamp(2.6rem,6.4vw,5rem)]"
           />
           <Reveal delay={0.15}>
-            <p className="mx-auto mt-7 max-w-[36rem] text-[1.125rem] leading-relaxed text-white/60">
+            <p className="lead mx-auto mt-7 max-w-[36rem]">
               Daily runs an MCP server, the open standard assistants use to connect to apps. Add it to Claude, ChatGPT,
               Gemini or any assistant that supports MCP. Your AI can then write your plan and read every set you log.
             </p>
@@ -301,12 +297,12 @@ export function Connect() {
           <Stage />
         </Reveal>
 
-        <div className="mt-20 grid gap-px overflow-hidden rounded-[28px] bg-white/10 md:mt-24 md:grid-cols-3">
+        <div className="mt-20 grid gap-px overflow-hidden rounded-[28px] border border-line bg-line md:mt-24 md:grid-cols-3">
           {steps.map((s, i) => (
-            <Reveal key={s.title} delay={i * 0.1} className="bg-night-2 p-7 md:p-8">
+            <Reveal key={s.title} delay={i * 0.1} className="bg-white p-7 md:p-8">
               <span className="font-mono text-[13px] text-red">0{i + 1}</span>
               <h3 className="mt-5 text-[19px] font-semibold tracking-[-0.01em]">{s.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-white/55">{s.body}</p>
+              <p className="mt-2 text-[15px] leading-relaxed text-muted">{s.body}</p>
             </Reveal>
           ))}
         </div>
