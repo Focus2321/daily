@@ -9,14 +9,16 @@ import { Headline, ease } from '../components/Reveal'
 export function Hero() {
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end start'] })
-  const backY = useTransform(scrollYProgress, [0, 1], [0, -60])
-  const frontY = useTransform(scrollYProgress, [0, 1], [0, -160])
-  const toastY = useTransform(scrollYProgress, [0, 1], [0, -240])
+  // Less parallax on narrow screens, where the card is small and close to the next section.
+  const k = typeof window !== 'undefined' && window.innerWidth < 768 ? 0.35 : 1
+  const backY = useTransform(scrollYProgress, [0, 1], [0, -60 * k])
+  const frontY = useTransform(scrollYProgress, [0, 1], [0, -160 * k])
+  const toastY = useTransform(scrollYProgress, [0, 1], [0, -240 * k])
   const ringRotate = useTransform(scrollYProgress, [0, 1], [0, 50])
 
   return (
-    <section id="top" ref={ref} className="relative pt-28 pb-20 md:pt-36 md:pb-28">
-      <div className="container-page grid items-center gap-14 lg:grid-cols-[1.02fr_1fr] lg:gap-10">
+    <section id="top" ref={ref} className="relative pt-24 pb-4 md:pt-36 md:pb-28">
+      <div className="container-page grid items-center gap-12 md:gap-14 lg:grid-cols-[1.02fr_1fr] lg:gap-10">
         <div>
           <Headline
             as="h1"
@@ -46,7 +48,7 @@ export function Hero() {
             </Button>
           </motion.div>
           <motion.div
-            className="mt-12 flex items-center gap-4"
+            className="mt-10 flex flex-col items-start gap-3 sm:mt-12 sm:flex-row sm:items-center sm:gap-4"
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 1, delay: 0.8 }}

@@ -49,7 +49,7 @@ export function LogSet() {
   const backY = useTransform(scrollYProgress, [0, 1], [70, -50])
 
   return (
-    <section id="training" ref={ref} className="py-24 md:py-36">
+    <section id="training" ref={ref} className="py-20 md:py-36">
       <div className="container-page grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         <div>
           <Headline lines={['All you type', 'is the set.']} className="text-[clamp(2.6rem,6vw,4.6rem)]" />

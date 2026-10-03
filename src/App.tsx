@@ -18,6 +18,7 @@ export default function App() {
   useEffect(() => {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches) return
     const lenis = new Lenis({ autoRaf: true, anchors: true })
+    if (import.meta.env.DEV) Object.assign(window, { lenis })
     return () => lenis.destroy()
   }, [])
 

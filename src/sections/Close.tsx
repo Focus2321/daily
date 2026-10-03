@@ -13,7 +13,7 @@ export function Close() {
   const frontY = useTransform(scrollYProgress, [0, 1], [280, 0])
 
   return (
-    <section ref={ref} className="py-24 md:py-36">
+    <section ref={ref} className="py-20 md:py-36">
       <div className="container-page grid items-center gap-14 lg:grid-cols-[1.05fr_0.95fr] lg:gap-20">
         <div>
           <Headline

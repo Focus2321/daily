@@ -172,7 +172,7 @@ function Demo() {
 
 export function TellOnce() {
   return (
-    <section id="week" className="py-24 md:py-36">
+    <section id="week" className="py-20 md:py-36">
       <div className="container-page grid items-center gap-14 lg:grid-cols-[0.9fr_1.1fr] lg:gap-20">
         <div>
           <Headline lines={['Tell it once.', 'It writes', 'your week.']} className="text-[clamp(2.6rem,6vw,4.6rem)]" />

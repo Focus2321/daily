@@ -61,7 +61,7 @@ export function Meals() {
   const backY = useTransform(scrollYProgress, [0, 1], [60, -60])
 
   return (
-    <section id="meals" ref={ref} className="bg-surface py-24 md:py-36">
+    <section id="meals" ref={ref} className="bg-surface py-20 md:py-36">
       <div className="container-page grid items-center gap-14 lg:grid-cols-[1.1fr_0.9fr] lg:gap-20">
         <Reveal y={40} className="order-2 lg:order-1">
           <div className="relative aspect-[1/1.02] overflow-hidden rounded-[36px] bg-red-soft">

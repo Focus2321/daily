@@ -53,7 +53,7 @@ function Builder() {
             animate={step >= 1 ? { opacity: 1, x: 0 } : {}}
             transition={{ duration: 0.6, ease, delay: i * 0.15 }}
           >
-            <span className="pb-1.5 text-[14px] font-medium">{name}</span>
+            <span className="pb-1.5 text-[14px] leading-snug font-medium">{name}</span>
             <span className="flex gap-2">
               <EmptyBox label="Sets" />
               <EmptyBox label="Reps" />
@@ -96,9 +96,9 @@ function Builder() {
 
       <div className="mt-6 flex items-center justify-between gap-4 text-[13px]">
         <span className="text-muted">
-          Meals this week <span className="font-medium text-ink">0 of 28 planned</span>
+          Meals <span className="font-medium whitespace-nowrap text-ink">0 of 28 planned</span>
         </span>
-        <span className="rounded-full bg-surface px-4 py-2 text-faint">Save and continue</span>
+        <span className="shrink-0 rounded-full bg-surface px-4 py-2 text-faint">Save and continue</span>
       </div>
     </div>
   )
@@ -106,7 +106,7 @@ function Builder() {
 
 export function Homework() {
   return (
-    <section className="py-24 md:py-36">
+    <section className="py-20 md:py-36">
       <div className="container-page grid items-center gap-14 lg:grid-cols-2 lg:gap-20">
         <div>
           <Headline lines={['Gym apps give', 'you homework.']} className="text-[clamp(2.6rem,6vw,4.6rem)]" />

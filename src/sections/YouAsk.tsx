@@ -92,7 +92,7 @@ function Chat() {
 
 export function YouAsk() {
   return (
-    <section className="bg-surface py-24 md:py-36">
+    <section className="bg-surface py-20 md:py-36">
       <div className="container-page grid items-center gap-14 lg:grid-cols-[1fr_1.05fr] lg:gap-20">
         <div>
           <Headline lines={['You already', 'ask your AI.']} className="text-[clamp(2.6rem,6vw,4.6rem)]" />
