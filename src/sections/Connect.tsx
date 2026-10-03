@@ -206,7 +206,7 @@ function Stage() {
               transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             >
               <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface">
-                <img src={ais[delivered].logo} alt="" className="size-5 brightness-0" />
+                <img src={ais[delivered].logo} alt="" className="size-5" />
               </span>
               <span className="min-w-0 text-[13px] leading-tight">
                 <span className="flex items-center justify-between font-semibold text-ink">
@@ -253,7 +253,7 @@ function Stage() {
                 }}
                 transition={{ type: 'spring', stiffness: 200, damping: 18 }}
               >
-                <img src={ai.logo} alt={ai.name} className="w-[52%] brightness-0" />
+                <img src={ai.logo} alt={ai.name} className="w-[52%]" />
               </motion.div>
               <span
                 className={`absolute top-full left-1/2 mt-2 -translate-x-1/2 text-[11px] whitespace-nowrap transition-colors md:text-[12.5px] ${

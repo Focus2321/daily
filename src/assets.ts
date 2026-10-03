@@ -17,7 +17,7 @@ export const ais = [
   { name: 'Claude', logo: asset('logos/claude-color.svg') },
   { name: 'ChatGPT', logo: asset('logos/openai.svg') },
   { name: 'Gemini', logo: asset('logos/gemini-color.svg') },
-  { name: 'Copilot', logo: asset('logos/copilot-color.svg') },
   { name: 'Grok', logo: asset('logos/grok.svg') },
-  { name: 'Mistral', logo: asset('logos/mistral-color.svg') },
+  { name: 'Muse', logo: asset('logos/muse.svg') },
+  { name: 'Grok Bot', logo: asset('logos/grok-bot.svg') },
 ] as const
