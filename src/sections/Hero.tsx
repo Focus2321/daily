@@ -31,7 +31,7 @@ export function Hero() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.9, ease, delay: 0.35 }}
           >
-            Daily is the gym and meals app on your phone. The AI you already use writes every workout and every meal. You
+            TrainPrompt is the gym and meals app on your phone. The AI you already use writes every workout and every meal. You
             show up, eat, and log the set.
           </motion.p>
           <motion.div

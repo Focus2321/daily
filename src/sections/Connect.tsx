@@ -291,12 +291,12 @@ export function Connect() {
       <div className="container-page">
         <div className="mx-auto max-w-[46rem] text-center">
           <Headline
-            lines={['Bring your AI.', { text: 'Connect it to Daily.', className: 'text-red' }]}
+            lines={['Bring your AI.', { text: 'Connect it to TrainPrompt.', className: 'text-red' }]}
             className="text-[clamp(2.6rem,6.4vw,5rem)]"
           />
           <Reveal delay={0.15}>
             <p className="lead mx-auto mt-7 max-w-[36rem]">
-              Daily runs an MCP server, the open standard assistants use to connect to apps. Add it to Claude, ChatGPT,
+              TrainPrompt runs an MCP server, the open standard assistants use to connect to apps. Add it to Claude, ChatGPT,
               Gemini or any assistant that supports MCP. Your AI can then write your plan and read every set you log.
             </p>
           </Reveal>

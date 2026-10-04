@@ -24,7 +24,7 @@ export function Nav() {
       <div className="container-page flex h-16 items-center justify-between">
         <a href="#top" className="flex items-center gap-2.5 text-[18px] font-semibold tracking-[-0.02em]">
           <Mark />
-          Daily
+          TrainPrompt
         </a>
         <nav className="hidden items-center gap-8 text-[14px] text-muted md:flex">
           {links.map((l) => (

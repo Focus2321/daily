@@ -21,7 +21,7 @@ export function Close() {
             className="text-[clamp(2.8rem,6.6vw,5.2rem)]"
           />
           <Reveal delay={0.15}>
-            <p className="lead mt-7 max-w-[28rem]">Daily is the app on your phone. The AI you already use is the trainer.</p>
+            <p className="lead mt-7 max-w-[28rem]">TrainPrompt is the app on your phone. The AI you already use is the trainer.</p>
           </Reveal>
           <div className="mt-9 flex flex-wrap gap-2.5">
             {ais.map((ai, i) => (
@@ -42,7 +42,7 @@ export function Close() {
             <Button href="#connect">
               How connecting works <Arrow />
             </Button>
-            <span className="text-[14px] text-muted">Daily is in early access. The app is coming soon.</span>
+            <span className="text-[14px] text-muted">TrainPrompt is in early access. The app is coming soon.</span>
           </Reveal>
         </div>
 
