@@ -67,7 +67,7 @@ function Demo() {
             <span className="grid size-9 place-items-center rounded-xl bg-white">
               <img src={ais[0].logo} alt="" className="size-5" />
             </span>
-            <span className="text-[14px] font-medium">Done. Your week is in Daily.</span>
+            <span className="text-[14px] font-medium">Done. Your week is in TrainPrompt.</span>
           </motion.div>
         )}
       </AnimatePresence>

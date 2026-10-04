@@ -1,6 +1,6 @@
 @import 'tailwindcss';
 
-/* Daily tokens, mirrored from the Paper file */
+/* TrainPrompt tokens, mirrored from the Paper file */
 @theme {
   --color-ground: #ffffff;
   --color-surface: #f6f5f3;
