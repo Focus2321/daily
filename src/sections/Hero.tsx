@@ -2,7 +2,7 @@ import { motion, useScroll, useTransform } from 'motion/react'
 import { useRef } from 'react'
 
 import { ais } from '../assets'
-import { Arrow, Button, Check, LogoRow } from '../components/Bits'
+import { Arrow, Button, LogoRow } from '../components/Bits'
 import { Phone } from '../components/Phone'
 import { Headline, ease } from '../components/Reveal'
 
@@ -111,18 +111,6 @@ export function Hero() {
                 <span className="text-muted">Added Chest &amp; Triceps for Monday</span>
               </span>
             </motion.div>
-          </motion.div>
-
-          <motion.div
-            className="absolute right-[6%] bottom-[22%] z-10 hidden items-center gap-2 rounded-full bg-ink py-2 pr-4 pl-2 text-[13px] text-white shadow-card sm:flex"
-            initial={{ opacity: 0, x: 20 }}
-            animate={{ opacity: 1, x: 0 }}
-            transition={{ type: 'spring', stiffness: 160, damping: 18, delay: 1.8 }}
-          >
-            <span className="grid size-6 place-items-center rounded-full bg-red">
-              <Check />
-            </span>
-            Lunch eaten
           </motion.div>
         </motion.div>
       </div>

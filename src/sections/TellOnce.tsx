@@ -2,108 +2,13 @@ import { AnimatePresence, motion, useInView } from 'motion/react'
 import { useRef } from 'react'
 
 import { ais } from '../assets'
-import { Phone, pt } from '../components/Phone'
-import { Headline, Reveal, ease } from '../components/Reveal'
+import { Phone } from '../components/Phone'
+import { Headline, Reveal } from '../components/Reveal'
+import { WeekScreen, plan } from '../components/WeekScreen'
 import { useSequence, useTypewriter } from '../components/hooks'
 
 const prompt =
   'Build me a 4 day split for size. 45 minutes max, my left shoulder is sore. High protein meals that take under 20 minutes to cook.'
-
-const plan = [
-  { day: 'MON', date: 5, title: 'Chest & Triceps', sub: 'Push A · 6 exercises', today: true },
-  { day: 'TUE', date: 6, title: 'Back & Biceps', sub: 'Pull A · 6 exercises' },
-  { day: 'WED', date: 7, title: 'Rest', sub: '30 min walk · stretch', rest: true },
-  { day: 'THU', date: 8, title: 'Legs', sub: 'Squat focus · 5 exercises' },
-  { day: 'FRI', date: 9, title: 'Shoulders & Arms', sub: 'Push B · 6 exercises' },
-  { day: 'SAT', date: 10, title: 'Legs', sub: 'Hinge focus · 5 exercises' },
-  { day: 'SUN', date: 11, title: 'Rest', sub: 'Full rest · meal prep', rest: true },
-]
-
-/** The Week screen rebuilt in HTML so each day can arrive on its own. */
-function WeekScreen({ filled }: { filled: number }) {
-  const stats = [
-    ['Workouts', '0/5'],
-    ['Meals eaten', '0/28'],
-    ['Rest days', '2'],
-  ]
-  return (
-    <div className="absolute inset-0 flex flex-col bg-white text-ink" style={{ padding: `${pt(54)} ${pt(20)} 0` }}>
-      <div className="font-medium text-muted" style={{ fontSize: pt(11), letterSpacing: '0.06em' }}>
-        OCT 5 – 11 · WEEK 6
-      </div>
-      <div className="font-semibold" style={{ fontSize: pt(30), letterSpacing: '-0.035em', marginTop: pt(4) }}>
-        This week
-      </div>
-      <div className="flex" style={{ gap: pt(8), marginTop: pt(18) }}>
-        {stats.map(([label, value]) => (
-          <div key={label} className="flex-1 bg-surface" style={{ borderRadius: pt(14), padding: pt(12) }}>
-            <div className="text-muted" style={{ fontSize: pt(10.5) }}>
-              {label}
-            </div>
-            <div className="font-semibold" style={{ fontSize: pt(20), marginTop: pt(4), letterSpacing: '-0.02em' }}>
-              {value}
-            </div>
-          </div>
-        ))}
-      </div>
-      <div className="font-medium text-muted" style={{ fontSize: pt(11), letterSpacing: '0.06em', marginTop: pt(24) }}>
-        PLAN
-      </div>
-      <div className="flex flex-col" style={{ gap: pt(8), marginTop: pt(10) }}>
-        {plan.map((d, i) => {
-          const ready = i < filled
-          return (
-            <div
-              key={d.day}
-              className={`relative flex items-center border ${d.today && ready ? 'border-red' : 'border-line'}`}
-              style={{ borderRadius: pt(16), padding: `${pt(11)} ${pt(14)}`, gap: pt(14), height: pt(62) }}
-            >
-              <div className="text-center" style={{ width: pt(30) }}>
-                <div className="text-muted" style={{ fontSize: pt(10) }}>
-                  {d.day}
-                </div>
-                <div className="font-semibold" style={{ fontSize: pt(17) }}>
-                  {d.date}
-                </div>
-              </div>
-              {ready ? (
-                  <motion.div
-                    key="text"
-                    className="min-w-0 flex-1"
-                    initial={{ opacity: 0, x: -8 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ duration: 0.4, ease }}
-                  >
-                    <div className={`font-semibold ${d.rest ? 'text-muted' : ''}`} style={{ fontSize: pt(14.5) }}>
-                      {d.title}
-                    </div>
-                    <div className="text-muted" style={{ fontSize: pt(11.5), marginTop: pt(2) }}>
-                      {d.sub}
-                    </div>
-                  </motion.div>
-                ) : (
-                  <div className="flex-1">
-                    <div className="bg-surface" style={{ height: pt(10), width: '58%', borderRadius: pt(5) }} />
-                    <div className="bg-surface" style={{ height: pt(8), width: '38%', borderRadius: pt(4), marginTop: pt(7) }} />
-                  </div>
-                )}
-              {d.today && ready && (
-                <motion.span
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  className="rounded-full bg-red font-medium text-white"
-                  style={{ fontSize: pt(10.5), padding: `${pt(4)} ${pt(9)}` }}
-                >
-                  Today
-                </motion.span>
-              )}
-            </div>
-          )
-        })}
-      </div>
-    </div>
-  )
-}
 
 function Demo() {
   const ref = useRef<HTMLDivElement>(null)
@@ -128,7 +33,7 @@ function Demo() {
 
       <div className="relative -mt-6 ml-auto w-[62%] max-w-[300px] translate-y-[8%] sm:-mt-10 sm:mr-[6%]">
         <Phone>
-          <WeekScreen filled={filled} />
+          <WeekScreen ready={plan.map((_, i) => i < filled)} meals={filled === plan.length} />
         </Phone>
         <AnimatePresence>
           {step === 1 && (

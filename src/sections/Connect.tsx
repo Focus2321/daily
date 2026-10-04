@@ -4,16 +4,22 @@ import { useEffect, useRef, useState } from 'react'
 import { ais } from '../assets'
 import { Phone } from '../components/Phone'
 import { Headline, Reveal } from '../components/Reveal'
+import { WeekScreen } from '../components/WeekScreen'
 import { useCycle } from '../components/hooks'
 
+// One note per AI, in `ais` order. Each push writes part of the week on the phone.
 const notes = [
   'Added Chest & Triceps for Monday',
-  'Planned 28 meals for this week',
-  'Swapped dips for close grip bench',
-  'Moved legs to Thursday',
-  'Bench goes up to 85 kg next week',
+  'Added Back & Biceps for Tuesday',
   'Added a 30 min walk on Wednesday',
+  'Put legs on Thursday and Saturday',
+  'Added Shoulders & Arms for Friday',
+  'Planned 28 meals and a rest Sunday',
 ]
+
+/** Which push writes each day of `plan`. */
+const writtenBy = [0, 1, 2, 3, 4, 3, 5]
+const mealsBy = 5
 
 type Point = [number, number]
 type Layout = {
@@ -48,7 +54,7 @@ const wide: Layout = {
     [100, 55],
     [100, 72],
   ],
-  toastTop: 20,
+  toastTop: 10,
 }
 
 const tall: Layout = {
@@ -72,7 +78,7 @@ const tall: Layout = {
     [45, 100],
     [57, 99],
   ],
-  toastTop: 30,
+  toastTop: 23,
 }
 
 const curve = ([x1, y1]: Point, [x2, y2]: Point, vertical: boolean) => {
@@ -99,6 +105,8 @@ function useWide() {
 function Comet({ d }: { d: string }) {
   const pathRef = useRef<SVGPathElement>(null)
   const dotRef = useRef<SVGCircleElement>(null)
+  // Starts on the AI tile, so the dot never flashes at the SVG origin before the first frame.
+  const start = d.slice(1).split(' ', 2)
   useEffect(() => {
     const path = pathRef.current
     const dot = dotRef.current
@@ -130,7 +138,7 @@ function Comet({ d }: { d: string }) {
         animate={{ pathLength: 1, opacity: [1, 1, 0.35] }}
         transition={{ pathLength: { duration: 0.9, ease: [0.45, 0, 0.2, 1] }, opacity: { duration: 2.4, times: [0, 0.5, 1] } }}
       />
-      <circle ref={dotRef} r={1.4} fill="#D7361F" stroke="#fff" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
+      <circle ref={dotRef} cx={start[0]} cy={start[1]} r={1.4} fill="#D7361F" stroke="#fff" strokeWidth={1.5} vectorEffect="non-scaling-stroke" />
     </g>
   )
 }
@@ -154,6 +162,11 @@ function Stage() {
     const id = setTimeout(() => setDelivered(active), 850)
     return () => clearTimeout(id)
   }, [active, inView])
+
+  // Pushes before the active one are in. The active one lands once its toast shows, so a new loop starts empty.
+  const built = (push: number) => push < active || (push === active && delivered === active)
+  const ready = writtenBy.map(built)
+  const writing = writtenBy.map((push) => inView && push === active)
 
   const paths = L.tiles.map((t, i) => curve(t, L.ends[i], !isWide))
   const pct = (v: number, of: number) => `${(v / of) * 100}%`
@@ -187,7 +200,9 @@ function Stage() {
         }}
       >
         <div ref={phoneRef}>
-          <Phone screen="week" />
+          <Phone>
+            <WeekScreen ready={ready} writing={writing} meals={built(mealsBy)} />
+          </Phone>
         </div>
       </div>
 
@@ -199,13 +214,13 @@ function Stage() {
           {delivered >= 0 && (
             <motion.div
               key={delivered}
-              className="flex items-center gap-3 rounded-2xl border border-line bg-white p-3 pr-4 shadow-card"
+              className="flex items-center gap-3 rounded-2xl border border-line bg-white p-2.5 pr-4 shadow-card md:p-3 md:pr-4"
               initial={{ opacity: 0, y: -18, scale: 0.94 }}
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.96, transition: { duration: 0.18 } }}
               transition={{ type: 'spring', stiffness: 300, damping: 26 }}
             >
-              <span className="grid size-9 shrink-0 place-items-center rounded-xl bg-surface">
+              <span className="grid size-8 shrink-0 place-items-center rounded-xl bg-surface md:size-9">
                 <img src={ais[delivered].logo} alt="" className="size-5" />
               </span>
               <span className="min-w-0 text-[13px] leading-tight">
@@ -270,12 +285,6 @@ function Stage() {
   )
 }
 
-const steps = [
-  { title: 'Add the Daily connector', body: "Open your AI's connector settings and add the Daily MCP server." },
-  { title: 'Sign in once', body: 'Your AI can see your plan and your logs. Nothing else on your phone.' },
-  { title: 'Ask in plain words', body: 'Your AI writes the week. It lands in Daily a moment later.' },
-]
-
 export function Connect() {
   return (
     <section id="connect" className="relative overflow-hidden py-20 md:py-36">
@@ -296,16 +305,6 @@ export function Connect() {
         <Reveal y={40} className="mt-16 md:mt-20">
           <Stage />
         </Reveal>
-
-        <div className="mt-20 grid gap-px overflow-hidden rounded-[28px] border border-line bg-line md:mt-24 md:grid-cols-3">
-          {steps.map((s, i) => (
-            <Reveal key={s.title} delay={i * 0.1} className="bg-white p-7 md:p-8">
-              <span className="font-mono text-[13px] text-red">0{i + 1}</span>
-              <h3 className="mt-5 text-[19px] font-semibold tracking-[-0.01em]">{s.title}</h3>
-              <p className="mt-2 text-[15px] leading-relaxed text-muted">{s.body}</p>
-            </Reveal>
-          ))}
-        </div>
       </div>
     </section>
   )
