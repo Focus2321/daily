@@ -1,17 +1,9 @@
 import type { ReactNode } from 'react'
 
-import { ais } from '../assets'
+import { ais, asset } from '../assets'
 
 export function Mark({ className = 'size-7' }: { className?: string }) {
-  return (
-    <svg viewBox="0 0 32 32" className={className} aria-hidden>
-      <rect width="32" height="32" rx="8" fill="#D7361F" />
-      <path
-        d="M10 9h6.2c4.6 0 7.8 2.9 7.8 7s-3.2 7-7.8 7H10V9zm4 3.4v7.2h2c2.3 0 3.8-1.4 3.8-3.6s-1.5-3.6-3.8-3.6h-2z"
-        fill="#fff"
-      />
-    </svg>
-  )
+  return <img src={asset('logo.svg')} alt="" className={`${className} object-contain`} />
 }
 
 export function Check({ className = 'size-3' }: { className?: string }) {
