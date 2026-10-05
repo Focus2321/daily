@@ -1,4 +1,5 @@
-import { Fact, LegalLayout } from './LegalLayout'
+import { facts } from './facts'
+import { LegalLayout } from './LegalLayout'
 import { privacyIntro, privacySections } from './Privacy'
 import { termsIntro, termsSections } from './Terms'
 
@@ -8,7 +9,7 @@ export default function LegalPage({ doc }: { doc: 'privacy' | 'terms' }) {
     <LegalLayout
       current="privacy"
       title="Privacy Policy"
-      effective={<Fact name="privacyEffective" hint="effective date" />}
+      updated={facts.privacyUpdated}
       intro={privacyIntro}
       sections={privacySections}
     />
@@ -16,7 +17,7 @@ export default function LegalPage({ doc }: { doc: 'privacy' | 'terms' }) {
     <LegalLayout
       current="terms"
       title="Terms of Service"
-      effective={<Fact name="termsEffective" hint="effective date" />}
+      updated={facts.termsUpdated}
       intro={termsIntro}
       sections={termsSections}
     />

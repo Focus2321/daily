@@ -1,4 +1,5 @@
-import { ContactEmail, Decision, Fact, type LegalSection } from './LegalLayout'
+import { facts } from './facts'
+import { ContactEmail, ContactUs, type LegalSection } from './LegalLayout'
 
 export const termsIntro = (
   <>
@@ -7,9 +8,9 @@ export const termsIntro = (
       assistants, and this website.
     </p>
     <p>
-      TrainPrompt is run by <Fact name="operator" hint="legal name of the operator" /> ("TrainPrompt", "we", "us"). By creating an
-      account or using TrainPrompt, you agree to these terms and to how we handle your information as described in our{' '}
-      <a href="/privacy">Privacy Policy</a>. If you don't agree, please don't use TrainPrompt.
+      {facts.operator && <>TrainPrompt is run by {facts.operator} ("TrainPrompt", "we", "us"). </>}
+      By creating an account or using TrainPrompt, you agree to these terms and to how we handle your information as described in
+      our <a href="/privacy">Privacy Policy</a>. If you don't agree, please don't use TrainPrompt.
     </p>
   </>
 )
@@ -34,8 +35,8 @@ export const termsSections: LegalSection[] = [
     body: (
       <>
         <p>
-          You must be at least <Fact name="minimumAge" hint="minimum age" /> years old and able to enter a binding agreement to use
-          TrainPrompt. You can't use it if the law where you live forbids it.
+          To use TrainPrompt, you must be {facts.minimumAge && <>at least {facts.minimumAge} years old and </>}able to enter a binding
+          agreement with us. You can't use it if the law where you live forbids it.
         </p>
       </>
     ),
@@ -101,7 +102,8 @@ export const termsSections: LegalSection[] = [
         <p>
           Your plans, logs and notes are yours. You give us permission to store, copy, process and display them only as needed to run
           TrainPrompt for you, including passing them to the assistants you connect. This permission ends when your content is
-          deleted, apart from backup copies that are removed on the schedule in the Privacy Policy.
+          deleted, apart from copies that stay in backups for a period, as described in the{' '}
+          <a href="/privacy#retention">Privacy Policy</a>.
         </p>
         <p>
           Don't add content you don't have the right to use, and don't put other people's personal information in your notes.
@@ -123,7 +125,7 @@ export const termsSections: LegalSection[] = [
           <li>copy, resell or build a competing product from TrainPrompt, or reverse engineer it except where the law allows.</li>
         </ul>
         <p>
-          If you find a security problem, please report it to <ContactEmail /> instead of testing it further.
+          If you find a security problem, please <ContactUs>report it to us</ContactUs> instead of testing it further.
         </p>
       </>
     ),
@@ -196,12 +198,14 @@ export const termsSections: LegalSection[] = [
           </li>
           <li>
             we aren't liable for injury or loss caused by following a plan, or by the actions of an AI assistant or other third-party
-            service;
+            service{facts.liabilityCap ? ';' : '.'}
           </li>
-          <li>
-            our total liability for all claims relating to TrainPrompt is limited to the greater of what you paid us in the 12 months
-            before the claim and <Fact name="liabilityCap" hint="cap amount" />.
-          </li>
+          {facts.liabilityCap && (
+            <li>
+              our total liability for all claims relating to TrainPrompt is limited to the greater of what you paid us in the 12
+              months before the claim and {facts.liabilityCap}.
+            </li>
+          )}
         </ul>
         <p>
           Some places don't allow these limits. Nothing in these terms limits liability for death or personal injury caused by our
@@ -240,19 +244,21 @@ export const termsSections: LegalSection[] = [
   },
   {
     id: 'disputes',
-    title: 'Governing law and disputes',
+    title: facts.governingLaw ? 'Governing law and disputes' : 'Disputes',
     body: (
       <>
         <p>
-          If you have a problem with TrainPrompt, please contact us first at <ContactEmail /> so we can try to fix it. These terms are
-          governed by the laws of <Fact name="governingLaw" hint="governing law" />, and disputes will be heard in{' '}
-          <Fact name="venue" hint="courts for disputes" />. If you live in a country whose consumer laws give you the right to bring a
-          claim in your local courts or under your local law, you keep that right.
+          If you have a problem with TrainPrompt, please <ContactUs /> first so we can try to fix it.
+          {facts.governingLaw && (
+            <>
+              {' '}
+              These terms are governed by the laws of {facts.governingLaw}
+              {facts.venue && <>, and disputes will be heard in {facts.venue}</>}.
+            </>
+          )}{' '}
+          If you live in a country whose consumer laws give you the right to bring a claim in your local courts or under your local
+          law, nothing in these terms takes that right away.
         </p>
-        <Decision>
-          Choose the governing law and courts. Decide whether you want an arbitration agreement and class action waiver; this draft
-          deliberately leaves them out, because they need a lawyer to draft and come with their own consumer rules.
-        </Decision>
       </>
     ),
   },
@@ -262,9 +268,8 @@ export const termsSections: LegalSection[] = [
     body: (
       <>
         <p>
-          We may update these terms as TrainPrompt changes. We'll post the new version here with a new effective date, and if a change
-          matters we'll tell you in the app or by email before it takes effect. If you keep using TrainPrompt after that, the new terms
-          apply. If you don't agree with them, stop using TrainPrompt and ask us to delete your account.
+          We may update these terms as TrainPrompt changes. When we do, we'll post the new version on this page. If you keep using
+          TrainPrompt after the new terms take effect, they apply to you. If you don't agree with them, stop using TrainPrompt.
         </p>
       </>
     ),
@@ -277,22 +282,30 @@ export const termsSections: LegalSection[] = [
         <p>
           These terms and the Privacy Policy are the whole agreement between you and us about TrainPrompt. If a court finds part of
           them unenforceable, the rest still applies. If we don't enforce a term straight away, we can still enforce it later. You can't
-          transfer your rights under these terms to someone else; we can transfer ours as part of a merger, sale or reorganization, and
-          these terms will keep protecting you.
+          transfer your rights under these terms to someone else; we can transfer ours as part of a merger, sale or reorganization.
         </p>
       </>
     ),
   },
-  {
-    id: 'contact',
-    title: 'Contact us',
-    body: (
-      <>
-        <p>
-          Questions about these terms go to <ContactEmail />, or by post to <Fact name="operator" hint="legal name of the operator" />,{' '}
-          <Fact name="address" hint="postal address" />.
-        </p>
-      </>
-    ),
-  },
+  ...(facts.contactEmail
+    ? [
+        {
+          id: 'contact',
+          title: 'Contact us',
+          body: (
+            <>
+              <p>
+                Questions about these terms go to <ContactEmail />.
+                {facts.operator && facts.address && (
+                  <>
+                    {' '}
+                    You can also write to {facts.operator}, {facts.address}.
+                  </>
+                )}
+              </p>
+            </>
+          ),
+        },
+      ]
+    : []),
 ]

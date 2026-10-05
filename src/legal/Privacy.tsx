@@ -1,4 +1,5 @@
-import { ContactEmail, Decision, Fact, type LegalSection } from './LegalLayout'
+import { facts } from './facts'
+import { ContactEmail, ContactUs, type LegalSection } from './LegalLayout'
 
 // Every statement here should match what the app, the MCP server and this site
 // actually do. If the product changes what it collects or who it shares with,
@@ -8,12 +9,12 @@ export const privacyIntro = (
   <>
     <p className="lead">
       TrainPrompt is a gym and meals app that your own AI assistant fills in. This policy explains what we keep about you, why, who
-      else handles it, and how to get it changed or deleted.
+      else handles it, and the choices you have.
     </p>
     <p>
-      TrainPrompt is run by <Fact name="operator" hint="legal name of the operator" /> ("TrainPrompt", "we", "us"). This policy
-      covers the TrainPrompt iPhone app, the TrainPrompt connector that AI assistants use (our MCP server), and this website at
-      trainprompt.app.
+      {facts.operator && <>TrainPrompt is run by {facts.operator} ("TrainPrompt", "we", "us"). </>}
+      This policy covers the TrainPrompt iPhone app, the TrainPrompt connector that AI assistants use (our MCP server), and this
+      website at trainprompt.app.
     </p>
   </>
 )
@@ -163,10 +164,9 @@ export const privacySections: LegalSection[] = [
           </li>
         </ul>
         <p>
-          Clerk, Convex and Vercel act on our instructions and may only use your information to provide their services to us. We may
-          also disclose information if the law requires it, to protect someone's safety or our rights, or as part of a merger, sale
-          or similar transfer of TrainPrompt. If that last one happens, this policy will keep applying to the information that moves
-          with it.
+          Clerk, Convex and Vercel handle your information on our behalf to provide their services to us. We may also disclose
+          information if the law requires it, to protect someone's safety or our rights, or as part of a merger, sale or similar
+          transfer of TrainPrompt.
         </p>
       </>
     ),
@@ -194,16 +194,10 @@ export const privacySections: LegalSection[] = [
           from our database straight away.
         </p>
         <p>
-          When your account is deleted, we delete your profile, plan, logs and tokens, and your sign-in details at Clerk. Copies can
-          remain in our providers' backups and logs for up to <Fact name="backupRetention" hint="backup retention period" /> before
-          they are erased. We may keep something longer if the law requires us to.
+          Deleted information can stay in our providers' backups and logs
+          {facts.backupRetention ? <> for up to {facts.backupRetention}</> : <> for a period</>} before it is erased. We may keep
+          information longer if the law requires us to.
         </p>
-        <Decision>
-          TrainPrompt can't delete an account today, in the app, over MCP or on the backend. Either build
-          deletion before this is published (Apple requires in-app account deletion for App Store apps), or commit to handling
-          deletion requests by email and say how long they take. Also confirm the real backup and log retention for Convex and Clerk
-          on your plans.
-        </Decision>
       </>
     ),
   },
@@ -220,7 +214,7 @@ export const privacySections: LegalSection[] = [
             it connecting.
           </li>
           <li>
-            You can ask us for a copy of your data, to correct it, or to delete your account by emailing <ContactEmail />.
+            You can <ContactUs>contact us</ContactUs> to ask for a copy of your information, to correct it, or to delete your account.
           </li>
         </ul>
         <p>
@@ -235,11 +229,6 @@ export const privacySections: LegalSection[] = [
           provide the service you signed up for; we have a legitimate interest in keeping TrainPrompt secure and working; and in some
           cases the law requires it.
         </p>
-        <Decision>
-          The app has no data export. Decide whether to build one or handle copies by email. Also confirm with a lawyer whether
-          workout and meal logs count as health data under laws like the GDPR or Washington's My Health My Data Act, which can require
-          explicit consent and a separate health data policy.
-        </Decision>
       </>
     ),
   },
@@ -264,8 +253,7 @@ export const privacySections: LegalSection[] = [
       <>
         <p>
           Our service providers may store and process your information in the United States and other countries, which may have
-          different data protection laws from yours. Where the law requires it, we rely on safeguards such as the European Commission's
-          standard contractual clauses for these transfers.
+          different data protection laws from yours.
         </p>
       </>
     ),
@@ -276,8 +264,15 @@ export const privacySections: LegalSection[] = [
     body: (
       <>
         <p>
-          TrainPrompt is for people aged <Fact name="minimumAge" hint="minimum age" /> and over. We don't knowingly collect personal
-          information from anyone younger. If you believe a child has given us their information, contact us and we'll delete it.
+          {facts.minimumAge ? (
+            <>
+              TrainPrompt is for people aged {facts.minimumAge} and over. We don't knowingly collect personal information from anyone
+              younger.
+            </>
+          ) : (
+            <>TrainPrompt isn't made for children, and we don't knowingly collect personal information from them.</>
+          )}{' '}
+          If you believe a child has given us their information, please <ContactUs /> so we can remove it.
         </p>
       </>
     ),
@@ -288,22 +283,30 @@ export const privacySections: LegalSection[] = [
     body: (
       <>
         <p>
-          If we change this policy, we'll post the new version here and update the effective date. If a change matters, for example a
-          new kind of data or a new company we share with, we'll tell you in the app or by email before it takes effect.
+          We may update this policy as TrainPrompt changes. When we do, we'll post the new version on this page.
         </p>
       </>
     ),
   },
-  {
-    id: 'contact',
-    title: 'Contact us',
-    body: (
-      <>
-        <p>
-          Questions or requests about your privacy go to <ContactEmail />. You can also write to{' '}
-          <Fact name="operator" hint="legal name of the operator" />, <Fact name="address" hint="postal address" />.
-        </p>
-      </>
-    ),
-  },
+  ...(facts.contactEmail
+    ? [
+        {
+          id: 'contact',
+          title: 'Contact us',
+          body: (
+            <>
+              <p>
+                Questions or requests about your privacy go to <ContactEmail />.
+                {facts.operator && facts.address && (
+                  <>
+                    {' '}
+                    You can also write to {facts.operator}, {facts.address}.
+                  </>
+                )}
+              </p>
+            </>
+          ),
+        },
+      ]
+    : []),
 ]

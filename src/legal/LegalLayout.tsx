@@ -2,50 +2,31 @@ import { useEffect, type ReactNode } from 'react'
 
 import { Mark } from '../components/Bits'
 import { Footer } from '../sections/Footer'
-import { facts, LEGAL_DRAFT, type FactName } from './facts'
+import { facts } from './facts'
 
 export type LegalSection = { id: string; title: string; body: ReactNode }
 
 type Props = {
   current: 'privacy' | 'terms'
   title: string
-  effective: ReactNode
+  updated: string | null
   intro: ReactNode
   sections: LegalSection[]
 }
 
-/** A business fact from facts.ts, or a highlighted placeholder until it's confirmed. */
-export function Fact({ name, hint }: { name: FactName; hint: string }) {
-  const value = facts[name]
-  if (value) return <>{value}</>
-  return <mark className="rounded-[4px] bg-red-soft px-1 py-px font-medium text-red-deep">[{hint}]</mark>
+/** "contact us", linked to the contact inbox once there is one. */
+export function ContactUs({ children = 'contact us' }: { children?: ReactNode }) {
+  return facts.contactEmail ? <a href={`mailto:${facts.contactEmail}`}>{children}</a> : <>{children}</>
 }
 
-/** The contact address as a mailto link, once it's confirmed. */
+/** The contact inbox as a mailto link. Only call this where facts.contactEmail is set. */
 export function ContactEmail() {
-  const email = facts.contactEmail
-  return email ? <a href={`mailto:${email}`}>{email}</a> : <Fact name="contactEmail" hint="contact email" />
+  return <a href={`mailto:${facts.contactEmail}`}>{facts.contactEmail}</a>
 }
 
-/** A whole clause still waiting on a decision. Rendered as a callout so it can't be missed. */
-export function Decision({ children }: { children: ReactNode }) {
-  return (
-    <div className="rounded-2xl border border-red/25 bg-red-soft/60 px-5 py-4 text-[14.5px]/[22px] text-red-deep">
-      <span className="font-semibold">To decide before publishing: </span>
-      {children}
-    </div>
-  )
-}
-
-export function LegalLayout({ current, title, effective, intro, sections }: Props) {
+export function LegalLayout({ current, title, updated, intro, sections }: Props) {
   useEffect(() => {
     document.title = `${title} · TrainPrompt`
-    if (!LEGAL_DRAFT) return
-    const robots = document.createElement('meta')
-    robots.name = 'robots'
-    robots.content = 'noindex'
-    document.head.append(robots)
-    return () => robots.remove()
   }, [title])
 
   // The page renders after load, so the browser's own jump to #section has nothing to land on yet.
@@ -74,13 +55,6 @@ export function LegalLayout({ current, title, effective, intro, sections }: Prop
       </header>
 
       <main className="container-page py-14 md:py-20">
-        {LEGAL_DRAFT && (
-          <div role="note" className="mb-12 rounded-2xl bg-surface px-5 py-4 text-[14.5px]/[22px] text-muted md:mb-16">
-            <span className="font-semibold text-ink">Draft for review.</span> This document is not yet in effect. Highlighted items are
-            facts or decisions still to be confirmed.
-          </div>
-        )}
-
         <div className="grid gap-12 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-20">
           <aside className="hidden lg:block">
             <nav aria-label="On this page" className="sticky top-10">
@@ -100,7 +74,7 @@ export function LegalLayout({ current, title, effective, intro, sections }: Prop
           <article className="max-w-[700px]">
             <p className="font-mono text-[12px] tracking-[0.08em] text-red uppercase">Legal</p>
             <h1 className="display mt-4 text-[clamp(2.6rem,6vw,4rem)]">{title}</h1>
-            <p className="mt-5 text-[14px] text-muted">Effective {effective}</p>
+            {updated && <p className="mt-5 text-[14px] text-muted">Last updated {updated}</p>}
             <div className="legal mt-10">{intro}</div>
 
             {sections.map((s, i) => (
