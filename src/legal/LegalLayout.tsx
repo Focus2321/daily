@@ -58,7 +58,6 @@ export function LegalLayout({ current, title, updated, intro, sections }: Props)
         <div className="grid gap-12 lg:grid-cols-[220px_minmax(0,1fr)] lg:gap-20">
           <aside className="hidden lg:block">
             <nav aria-label="On this page" className="sticky top-10">
-              <p className="mb-4 font-mono text-[11.5px] tracking-[0.08em] text-faint uppercase">On this page</p>
               <ol className="flex flex-col gap-2.5 text-[13.5px]/[18px] text-muted">
                 {sections.map((s) => (
                   <li key={s.id}>
@@ -72,17 +71,13 @@ export function LegalLayout({ current, title, updated, intro, sections }: Props)
           </aside>
 
           <article className="max-w-[700px]">
-            <p className="font-mono text-[12px] tracking-[0.08em] text-red uppercase">Legal</p>
-            <h1 className="display mt-4 text-[clamp(2.6rem,6vw,4rem)]">{title}</h1>
+            <h1 className="display text-[clamp(2.6rem,6vw,4rem)]">{title}</h1>
             {updated && <p className="mt-5 text-[14px] text-muted">Last updated {updated}</p>}
             <div className="legal mt-10">{intro}</div>
 
-            {sections.map((s, i) => (
+            {sections.map((s) => (
               <section key={s.id} id={s.id} className="legal mt-14 scroll-mt-8 border-t border-line pt-10">
-                <h2>
-                  <span className="mr-3 font-mono text-[14px] font-normal text-faint">{String(i + 1).padStart(2, '0')}</span>
-                  {s.title}
-                </h2>
+                <h2>{s.title}</h2>
                 {s.body}
               </section>
             ))}
