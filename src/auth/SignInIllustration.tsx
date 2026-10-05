@@ -3,47 +3,125 @@ import { LogoMark } from './icons.tsx'
 
 /*
  * The sign-in illustration (Paper: "Login illustration · Chat → Phone", option A).
- * Someone asks Claude for a week of training and meals, Claude sends it to TrainPrompt, and the
- * week fills in on the phone. It is drawn on a fixed 720×900 stage and scaled to fit its box.
+ * Someone asks an assistant for a week of training or meals, it sends the plan to TrainPrompt, and
+ * the week fills in on the phone. Three scenes (Claude, Muse, Grok) take turns. It is drawn on a
+ * fixed 720×900 stage and scaled to fit its box.
  * Everything is derived from one looping clock, so reduced motion simply freezes it on the result.
  */
 
 const STAGE_W = 720
 const STAGE_H = 900
 
-const REQUEST = 'Build my workout and meal plan for this week. I can train four days.'
-const ON_IT = 'On it. Four training days with meals to match, sending it to TrainPrompt.'
-const DONE = 'Done. Your week is in TrainPrompt: four training days, three rest days and every meal planned.'
+type Day = { dow: string; date: number; title: string; sub: string; rest?: boolean; kcal?: number; protein?: number }
+type StatValue = { label: string; value?: number; of?: number }
 
-type Day = { dow: string; date: number; title: string; sub: string; rest?: boolean }
-const WEEK: Day[] = [
-  { dow: 'Mon', date: 5, title: 'Chest & Triceps', sub: 'Push · 6 exercises · 3 meals' },
-  { dow: 'Tue', date: 6, title: 'Legs', sub: 'Squat focus · 3 meals' },
-  { dow: 'Wed', date: 7, title: 'Rest', sub: '30 min walk · 3 meals', rest: true },
-  { dow: 'Thu', date: 8, title: 'Back & Biceps', sub: 'Pull · 6 exercises · 3 meals' },
-  { dow: 'Fri', date: 9, title: 'Legs & Shoulders', sub: 'Hinge focus · 3 meals' },
-  { dow: 'Sat', date: 10, title: 'Rest', sub: 'Long walk · 3 meals', rest: true },
-  { dow: 'Sun', date: 11, title: 'Rest', sub: 'Meal prep · 3 meals', rest: true },
+/** One assistant writing one kind of week. The loop plays the scenes in turn so it never repeats back to back. */
+type Scene = {
+  assistant: string
+  logo: string
+  request: string
+  onIt: string
+  done: string
+  saved: string
+  week: Day[]
+  stats: (sent: Day[]) => StatValue[]
+}
+
+const workoutCount = (sent: Day[]) => sent.filter((d) => !d.rest).length
+const average = (sent: Day[], key: 'kcal' | 'protein') =>
+  sent.length ? Math.round(sent.reduce((sum, d) => sum + (d[key] ?? 0), 0) / sent.length) : 0
+
+const SCENES: Scene[] = [
+  {
+    assistant: 'Claude',
+    logo: '/logos/claude-color.svg',
+    request: 'Build my workout and meal plan for this week. I can train four days.',
+    onIt: 'On it. Four training days with meals to match, sending it to TrainPrompt.',
+    done: 'Done. Your week is in TrainPrompt: four training days, three rest days and every meal planned.',
+    saved: '4 workouts · 21 meals',
+    week: [
+      { dow: 'Mon', date: 5, title: 'Chest & Triceps', sub: 'Push · 6 exercises · 3 meals' },
+      { dow: 'Tue', date: 6, title: 'Legs', sub: 'Squat focus · 3 meals' },
+      { dow: 'Wed', date: 7, title: 'Rest', sub: '30 min walk · 3 meals', rest: true },
+      { dow: 'Thu', date: 8, title: 'Back & Biceps', sub: 'Pull · 6 exercises · 3 meals' },
+      { dow: 'Fri', date: 9, title: 'Legs & Shoulders', sub: 'Hinge focus · 3 meals' },
+      { dow: 'Sat', date: 10, title: 'Rest', sub: 'Long walk · 3 meals', rest: true },
+      { dow: 'Sun', date: 11, title: 'Rest', sub: 'Meal prep · 3 meals', rest: true },
+    ],
+    stats: (sent) => [
+      { label: 'Workouts', of: workoutCount(sent) },
+      { label: 'Meals eaten', of: sent.length * 3 },
+      { label: 'Rest days', value: sent.length - workoutCount(sent) },
+    ],
+  },
+  {
+    assistant: 'Muse',
+    logo: '/logos/muse.svg',
+    request: 'Plan my meals for this week. High protein, about 2,200 calories a day.',
+    onIt: 'On it. Seven days of high protein meals, sending them to TrainPrompt.',
+    done: 'Done. Your meals are in TrainPrompt: 21 meals at about 2,200 calories a day.',
+    saved: '21 meals · 7 days',
+    week: [
+      { dow: 'Mon', date: 5, title: 'Salmon & rice', sub: '3 meals · 2,180 kcal', kcal: 2180, protein: 168 },
+      { dow: 'Tue', date: 6, title: 'Chicken burrito bowls', sub: '3 meals · 2,240 kcal', kcal: 2240, protein: 174 },
+      { dow: 'Wed', date: 7, title: 'Turkey chili', sub: '3 meals · 2,150 kcal', kcal: 2150, protein: 162 },
+      { dow: 'Thu', date: 8, title: 'Steak & potatoes', sub: '3 meals · 2,260 kcal', kcal: 2260, protein: 171 },
+      { dow: 'Fri', date: 9, title: 'Shrimp stir fry', sub: '3 meals · 2,190 kcal', kcal: 2190, protein: 165 },
+      { dow: 'Sat', date: 10, title: 'Chicken pesto pasta', sub: '3 meals · 2,280 kcal', kcal: 2280, protein: 170 },
+      { dow: 'Sun', date: 11, title: 'Roast chicken', sub: '3 meals · 2,120 kcal', kcal: 2120, protein: 166 },
+    ],
+    stats: (sent) => [
+      { label: 'Meals eaten', of: sent.length * 3 },
+      { label: 'Avg kcal', value: average(sent, 'kcal') },
+      { label: 'Protein g', value: average(sent, 'protein') },
+    ],
+  },
+  {
+    assistant: 'Grok',
+    logo: '/logos/grok-bot.svg',
+    request: 'Make me a five day strength split this week. 45 minutes a session.',
+    onIt: 'On it. Five 45 minute sessions and two rest days, sending to TrainPrompt.',
+    done: 'Done. Your split is in TrainPrompt: five strength days and two rest days.',
+    saved: '5 workouts · 225 min',
+    week: [
+      { dow: 'Mon', date: 5, title: 'Upper push', sub: 'Bench · 5 exercises · 45 min' },
+      { dow: 'Tue', date: 6, title: 'Lower', sub: 'Squat · 5 exercises · 45 min' },
+      { dow: 'Wed', date: 7, title: 'Upper pull', sub: 'Rows · 5 exercises · 45 min' },
+      { dow: 'Thu', date: 8, title: 'Rest', sub: 'Mobility · 20 min', rest: true },
+      { dow: 'Fri', date: 9, title: 'Shoulders & arms', sub: 'Press · 5 exercises · 45 min' },
+      { dow: 'Sat', date: 10, title: 'Lower', sub: 'Deadlift · 5 exercises · 45 min' },
+      { dow: 'Sun', date: 11, title: 'Rest', sub: 'Long walk', rest: true },
+    ],
+    stats: (sent) => [
+      { label: 'Workouts', of: workoutCount(sent) },
+      { label: 'Minutes', value: workoutCount(sent) * 45 },
+      { label: 'Rest days', value: sent.length - workoutCount(sent) },
+    ],
+  },
 ]
 
 // The loop, in ms: 01 request, 02 confirm and connect, 03 the week fills, then hold and crossfade back.
-const SHOW_AT = 40
-const TYPE_AT = 350
-const CPS = 45
-const PULSE_AT = 1950
-const CONFIRM_AT = 2200
-const REPLY_AT = 2300
-const CHIP_AT = 2500
-const LINE_AT = 2750
-const RIDES = [3250, 3700]
-const RIDE_MS = 450
-const COMPLETE_AT = 4200
-const FILL_AT = [3250, 3700, 4500, 4680, 4860, 5040, 5220]
-const DONE_AT = 5450
-const LEAVE_AT = 8300
-const LOOP_MS = 8800
+// Timings were tuned at 1× and are played SLOW times longer so each step has room to read.
+const SLOW = 1.4
+const at = (ms: number) => Math.round(ms * SLOW)
+const SHOW_AT = at(40)
+const TYPE_AT = at(350)
+const TYPE_END = at(1880)
+const PULSE_AT = at(1950)
+const CONFIRM_AT = at(2200)
+const REPLY_AT = at(2300)
+const CHIP_AT = at(2500)
+const LINE_AT = at(2750)
+const RIDES = [at(3250), at(3700)]
+const RIDE_MS = at(450)
+const COMPLETE_AT = at(4200)
+const FILL_AT = [3250, 3700, 4500, 4680, 4860, 5040, 5220].map(at)
+const DONE_AT = at(5450)
+const LEAVE_AT = at(8300)
+const LOOP_MS = at(8800)
 
 type Frame = {
+  scene: number
   phase: 0 | 1 | 2
   instant: boolean
   visible: boolean
@@ -58,11 +136,17 @@ type Frame = {
   done: boolean
 }
 
-function frameAt(t: number): Frame {
-  const typed = Math.max(0, Math.min(REQUEST.length, Math.floor(((t - TYPE_AT) / 1000) * CPS)))
+/** `clock` runs across loops; each loop plays the next scene. */
+function frameAt(clock: number): Frame {
+  const scene = Math.floor(clock / LOOP_MS) % SCENES.length
+  const t = clock % LOOP_MS
+  const { request } = SCENES[scene]
+  // Typing always takes the same time, whatever the length of the request.
+  const typed = Math.max(0, Math.min(request.length, Math.floor(((t - TYPE_AT) / (TYPE_END - TYPE_AT)) * request.length)))
   const phase = t < CONFIRM_AT ? 0 : t < COMPLETE_AT ? 1 : 2
   const filled = FILL_AT.filter((at) => t >= at).length
   return {
+    scene,
     phase,
     instant: t < SHOW_AT,
     visible: t >= SHOW_AT && t < LEAVE_AT,
@@ -102,16 +186,17 @@ function useFrame(): Frame {
       setFrame(FINAL)
       return
     }
-    // In development, ?t=4800 holds the loop at that moment, for checking a step by eye.
-    const hold = import.meta.env.DEV ? new URLSearchParams(location.search).get('t') : null
+    // In development, ?t=4800&scene=1 holds that scene at that moment, for checking a step by eye.
+    const params = import.meta.env.DEV ? new URLSearchParams(location.search) : null
+    const hold = params?.get('t')
     if (hold) {
-      setFrame(frameAt(Number(hold)))
+      setFrame(frameAt(Number(params?.get('scene') ?? 0) * LOOP_MS + Number(hold)))
       return
     }
     const start = performance.now()
     let raf = 0
     const tick = (now: number) => {
-      const next = frameAt((now - start) % LOOP_MS)
+      const next = frameAt((now - start) % (LOOP_MS * SCENES.length))
       setFrame((prev) => (sameFrame(prev, next) ? prev : next))
       raf = requestAnimationFrame(tick)
     }
@@ -195,7 +280,7 @@ export function SignInIllustration({
           className="absolute top-0 left-0"
           style={{
             transform: `translate(${px}px, ${py}px)`,
-            transition: move(f.phase === 2 ? 650 : 520, f.phase === 2 ? spring : ease),
+            transition: move(f.phase === 2 ? 800 : 680, f.phase === 2 ? spring : ease),
             zIndex: f.phase === 0 ? 1 : 2,
           }}
         >
@@ -207,7 +292,7 @@ export function SignInIllustration({
           style={{
             transform: `translate(${cx}px, ${cy + (f.visible ? 0 : 24)}px)`,
             opacity: f.visible ? 1 : 0,
-            transition: move(520, ease),
+            transition: move(680, ease),
             zIndex: f.phase === 0 ? 2 : 1,
           }}
         >
@@ -221,11 +306,12 @@ export function SignInIllustration({
 }
 
 function Chat({ f }: { f: Frame }) {
+  const { assistant, logo, request, onIt, done, saved } = SCENES[f.scene]
   return (
     <div className="flex w-[384px] flex-col overflow-hidden rounded-[26px] bg-(--s-surface) shadow-[0_24px_48px_#3c0a0040]">
       <div className="flex items-center gap-2.5 border-b border-(--s-line) px-5 py-4">
-        <img src="/logos/claude-color.svg" alt="" className="size-[22px] shrink-0" />
-        <span className="flex-1 text-[15px]/[20px] font-semibold">Claude</span>
+        <img src={logo} alt="" className="size-[22px] shrink-0" />
+        <span className="flex-1 text-[15px]/[20px] font-semibold">{assistant}</span>
         <span className="flex items-center gap-1.5 rounded-full bg-(--s-ground) py-1 pr-2.5 pl-2">
           <span className="size-1.5 rounded-full bg-red" />
           <span className="text-[12px]/[16px] font-medium text-(--s-muted)">TrainPrompt</span>
@@ -235,9 +321,9 @@ function Chat({ f }: { f: Frame }) {
       <div className="flex flex-col px-5 pt-[22px] pb-2">
         <div className="flex justify-end pl-10">
           <p className="rounded-[20px_20px_6px_20px] bg-(--s-ground) px-4 py-3 text-[16px]/[23px]">
-            {REQUEST.slice(0, f.typed)}
+            {request.slice(0, f.typed)}
             {f.typing && <span className="caret" />}
-            <span className="text-transparent">{REQUEST.slice(f.typed)}</span>
+            <span className="text-transparent">{request.slice(f.typed)}</span>
           </p>
         </div>
 
@@ -252,10 +338,10 @@ function Chat({ f }: { f: Frame }) {
             >
               <div className="grid text-[16px]/[23px]">
                 <p className="col-start-1 row-start-1 transition-opacity duration-300" style={{ opacity: f.done ? 0 : 1 }}>
-                  {ON_IT}
+                  {onIt}
                 </p>
                 <p className="col-start-1 row-start-1 transition-opacity duration-300" style={{ opacity: f.done ? 1 : 0 }}>
-                  {DONE}
+                  {done}
                 </p>
               </div>
               <div
@@ -268,7 +354,7 @@ function Chat({ f }: { f: Frame }) {
                 <span className="flex flex-col gap-px">
                   <span className="text-[13px]/[16px] font-medium">{f.done ? 'Saved to TrainPrompt' : 'Saving your week'}</span>
                   <span className="font-mono text-[11px]/[14px] text-(--s-muted)">
-                    {f.done ? '4 workouts · 21 meals' : `TrainPrompt · ${f.filled} of 7 days`}
+                    {f.done ? saved : `TrainPrompt · ${f.filled} of 7 days`}
                   </span>
                 </span>
               </div>
@@ -279,7 +365,7 @@ function Chat({ f }: { f: Frame }) {
 
       <div className="px-4 pt-3 pb-4">
         <div className="flex h-[46px] items-center gap-2.5 rounded-full border border-(--s-line) pr-1.5 pl-4">
-          <span className="flex-1 text-[15px]/[20px] text-(--s-faint)">Reply to Claude…</span>
+          <span className="flex-1 text-[15px]/[20px] text-(--s-faint)">Reply to {assistant}…</span>
           <span
             className={`flex size-[34px] shrink-0 items-center justify-center rounded-full bg-ink ${f.pulse ? 'animate-[tp-pulse_420ms_ease-out]' : ''}`}
           >
@@ -293,7 +379,7 @@ function Chat({ f }: { f: Frame }) {
   )
 }
 
-/** The dotted line from Claude's chip into the plan, drawn on in step 02 with a dot riding it per day sent. */
+/** The dotted line from the assistant's chip into the plan, drawn on in step 02 with a dot riding it per day sent. */
 function Connector({ f }: { f: Frame }) {
   return (
     <div
@@ -310,7 +396,7 @@ function Connector({ f }: { f: Frame }) {
               strokeWidth="12"
               pathLength={1}
               strokeDasharray="1"
-              className={f.line ? 'animate-[tp-draw_500ms_cubic-bezier(0.22,1,0.36,1)_both]' : ''}
+              className={f.line ? 'animate-[tp-draw_700ms_cubic-bezier(0.22,1,0.36,1)_both]' : ''}
               style={{ strokeDashoffset: f.line ? undefined : 1 }}
             />
           </mask>
@@ -325,8 +411,8 @@ function Connector({ f }: { f: Frame }) {
       {f.ride >= 0 && (
         <span
           key={f.ride}
-          className="absolute top-0 left-0 size-3 rounded-full border-2 border-red bg-white animate-[tp-ride_450ms_cubic-bezier(0.45,0,0.55,1)_both]"
-          style={{ offsetPath: `path('${LINE_PATH}')`, offsetRotate: '0deg' }}
+          className="absolute top-0 left-0 size-3 rounded-full border-2 border-red bg-white animate-[tp-ride_cubic-bezier(0.45,0,0.55,1)_both]"
+          style={{ offsetPath: `path('${LINE_PATH}')`, offsetRotate: '0deg', animationDuration: `${RIDE_MS}ms` }}
         />
       )}
     </div>
@@ -334,9 +420,8 @@ function Connector({ f }: { f: Frame }) {
 }
 
 function PhoneWeek({ f }: { f: Frame }) {
-  const sent = WEEK.slice(0, f.filled)
-  const workouts = sent.filter((d) => !d.rest).length
-  const rest = sent.length - workouts
+  const { week, stats } = SCENES[f.scene]
+  const sent = week.slice(0, f.filled)
   const shadow = f.phase === 0 ? '0 24px 56px #3c0a0040' : '0 40px 80px #3c0a0066'
 
   return (
@@ -370,19 +455,20 @@ function PhoneWeek({ f }: { f: Frame }) {
         </div>
 
         <div className="flex shrink-0 gap-1.5 px-3">
-          <Stat label="Workouts" of={workouts} />
-          <Stat label="Meals eaten" of={sent.length * 3} />
-          <Stat label="Rest days" value={rest} />
+          {stats(sent).map((stat) => (
+            <Stat key={stat.label} {...stat} />
+          ))}
         </div>
 
         <div className="flex shrink-0 flex-col gap-2 px-3 pt-4">
           <span className="pl-1 text-[11px]/[14px] font-medium tracking-[0.08em] text-(--s-muted) uppercase">Plan</span>
           <div className="flex flex-col overflow-hidden rounded-[18px] border border-(--s-line) bg-(--s-surface)">
-            {WEEK.map((day, i) => (
+            {week.map((day, i) => (
               <DayRow
                 key={day.dow}
                 day={day}
                 index={i}
+                last={i === week.length - 1}
                 state={i < f.filled ? 'filled' : i === f.filled && f.phase > 0 && f.filled > 0 ? 'loading' : 'open'}
               />
             ))}
@@ -407,7 +493,7 @@ function PhoneWeek({ f }: { f: Frame }) {
   )
 }
 
-function Stat({ label, value = 0, of }: { label: string; value?: number; of?: number }) {
+function Stat({ label, value = 0, of }: StatValue) {
   return (
     <div className="flex flex-1 basis-0 flex-col gap-1 rounded-[14px] border border-(--s-line) bg-(--s-surface) p-2.5">
       <span className="text-[11px]/[14px] font-medium text-(--s-muted)">{label}</span>
@@ -427,14 +513,13 @@ function Stat({ label, value = 0, of }: { label: string; value?: number; of?: nu
 function Count({ n, className }: { n: number; className?: string }) {
   return (
     <span key={n} className={`inline-block ${n ? 'animate-[tp-rise_260ms_cubic-bezier(0.22,1,0.36,1)_both]' : ''} ${className ?? ''}`}>
-      {n}
+      {n.toLocaleString('en-US')}
     </span>
   )
 }
 
-function DayRow({ day, index, state }: { day: Day; index: number; state: 'open' | 'loading' | 'filled' }) {
+function DayRow({ day, index, last, state }: { day: Day; index: number; last: boolean; state: 'open' | 'loading' | 'filled' }) {
   const today = index === 0
-  const last = index === WEEK.length - 1
   const bg = today ? 'bg-(--s-soft)' : state === 'loading' ? 'bg-[#fff8f6]' : ''
   const dateColor = today ? 'text-red' : state === 'filled' && !day.rest ? 'text-ink' : 'text-(--s-faint)'
 
