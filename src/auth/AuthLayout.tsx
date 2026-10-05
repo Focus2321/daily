@@ -1,4 +1,5 @@
 import { useEffect, useState, type ReactNode } from 'react'
+import { Mark } from '../components/Bits'
 import { LogoMark } from './icons.tsx'
 import { SignInIllustration } from './SignInIllustration.tsx'
 
@@ -27,15 +28,16 @@ export function AuthLayout({ children }: { children: ReactNode }) {
       {!desktop && (
         <header className="flex flex-col bg-red">
           <div className="flex items-center gap-3 px-6 pt-7">
-            <LogoMark className="h-8 w-[38px] shrink-0" />
-            <span className="text-[24px]/[28px] font-semibold tracking-[-0.035em] text-white">TrainPrompt</span>
+            <LogoMark className="h-11 w-[52px] shrink-0" />
+            <span className="text-[32px]/[36px] font-semibold tracking-[-0.035em] text-white">TrainPrompt</span>
           </div>
           <SignInIllustration crop={{ top: 64, height: 560 }} className="aspect-[720/560] max-h-[340px] w-full" />
         </header>
       )}
 
       <main className="flex flex-1 flex-col px-5 pt-8 pb-6 lg:w-1/2 lg:flex-none lg:px-14 lg:py-10">
-        <a href="/" className="hidden self-start text-[20px]/[24px] font-semibold tracking-[-0.03em] lg:block">
+        <a href="/" className="hidden items-center gap-3 self-start text-[32px]/[36px] font-semibold tracking-[-0.035em] lg:flex">
+          <Mark className="h-11 w-[52px] shrink-0" />
           TrainPrompt
         </a>
         <div className="flex flex-1 flex-col lg:items-center lg:justify-center">
