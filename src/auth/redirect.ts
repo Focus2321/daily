@@ -87,25 +87,3 @@ export function isOAuthHandoff(url: string): boolean {
     return false
   }
 }
-
-/**
- * A best guess at which AI is connecting, from the `redirect_uri` inside the
- * authorize URL. The client's registered name is only readable once signed in,
- * so unknown or local clients (Claude Code, Cursor's loopback) get no name.
- */
-export function connectingClient(url: string): string | null {
-  try {
-    const redirectUri = new URL(url, window.location.origin).searchParams.get('redirect_uri')
-    if (!redirectUri) return null
-    const host = new URL(redirectUri).hostname.toLowerCase()
-    const is = (domain: string) => host === domain || host.endsWith(`.${domain}`)
-    if (is('claude.ai') || is('claude.com') || is('anthropic.com')) return 'Claude'
-    if (is('chatgpt.com') || is('openai.com')) return 'ChatGPT'
-    if (is('cursor.com') || is('cursor.sh')) return 'Cursor'
-    if (is('perplexity.ai')) return 'Perplexity'
-    if (is('mistral.ai')) return 'Le Chat'
-    return null
-  } catch {
-    return null
-  }
-}

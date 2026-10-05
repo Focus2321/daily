@@ -5,7 +5,7 @@ import { AuthLayout } from './AuthLayout.tsx'
 import { clerkError } from './clerkError.ts'
 import { AppleIcon, ChevronLeft, GoogleIcon, Spinner } from './icons.tsx'
 import { leaveTo } from './navigate.ts'
-import { RETURN_PARAM, connectingClient, isOAuthHandoff, redirectTarget } from './redirect.ts'
+import { RETURN_PARAM, isOAuthHandoff, redirectTarget } from './redirect.ts'
 
 const CODE_LENGTH = 6
 const RESEND_AFTER_S = 60
@@ -27,7 +27,6 @@ export function SignInPage() {
 
   const target = useMemo(() => redirectTarget(), [])
   const handoff = target.fromClient && isOAuthHandoff(target.url)
-  const client = handoff ? connectingClient(target.url) : null
 
   const [sent, setSent] = useState<Sent | null>(null)
   const [onCode, setOnCode] = useState(false)
@@ -258,14 +257,6 @@ export function SignInPage() {
           ) : (
             <>
               <Heading
-                top={
-                  handoff ? (
-                    <span className="inline-flex max-w-full items-center gap-2 self-start rounded-full bg-red-soft px-3 py-1.5 text-[12.5px]/[18px] font-medium text-red-deep lg:text-[13px]">
-                      <span className="size-2 shrink-0 rounded-full bg-red" />
-                      {client ?? 'Your AI'} wants to access your TrainPrompt account
-                    </span>
-                  ) : null
-                }
                 title="Sign in"
               >
                 {handoff ? 'Sign in to connect your AI to TrainPrompt.' : 'Sign in to your TrainPrompt account.'}
@@ -338,7 +329,7 @@ export function SignInPage() {
   )
 }
 
-function Heading({ top, title, children }: { top: ReactNode; title: string; children: ReactNode }) {
+function Heading({ top, title, children }: { top?: ReactNode; title: string; children: ReactNode }) {
   return (
     <div className="flex flex-col gap-3 pb-7 lg:gap-3.5 lg:pb-9">
       {top}
