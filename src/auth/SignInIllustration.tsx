@@ -138,8 +138,11 @@ type Frame = {
 
 /** `clock` runs across loops; each loop plays the next scene. */
 function frameAt(clock: number): Frame {
-  const scene = Math.floor(clock / LOOP_MS) % SCENES.length
-  const t = clock % LOOP_MS
+  // The first animation frame can be stamped a moment before `start`, so wrap negatives into the cycle.
+  const cycle = LOOP_MS * SCENES.length
+  const c = ((clock % cycle) + cycle) % cycle
+  const scene = Math.floor(c / LOOP_MS)
+  const t = c % LOOP_MS
   const { request } = SCENES[scene]
   // Typing always takes the same time, whatever the length of the request.
   const typed = Math.max(0, Math.min(request.length, Math.floor(((t - TYPE_AT) / (TYPE_END - TYPE_AT)) * request.length)))
