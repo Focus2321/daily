@@ -1,14 +1,38 @@
-import type { ReactNode } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { LogoMark } from './icons.tsx'
+import { SignInIllustration } from './SignInIllustration.tsx'
 
-/** Split screen on desktop (form left, red brand panel right); a red band over the form on mobile. */
+const DESKTOP = '(min-width: 64rem)'
+
+function useDesktop() {
+  const [desktop, setDesktop] = useState(() => window.matchMedia(DESKTOP).matches)
+  useEffect(() => {
+    const mq = window.matchMedia(DESKTOP)
+    const on = () => setDesktop(mq.matches)
+    mq.addEventListener('change', on)
+    return () => mq.removeEventListener('change', on)
+  }, [])
+  return desktop
+}
+
+/**
+ * Split screen on desktop (form left, the illustration on red right). On mobile the same
+ * illustration sits in a red band over the form, cropped to its top so the phone runs off the edge.
+ */
 export function AuthLayout({ children }: { children: ReactNode }) {
+  const desktop = useDesktop()
+
   return (
     <div className="flex min-h-dvh flex-col bg-ground text-ink lg:flex-row">
-      <header className="flex items-center gap-3.5 bg-red px-6 pt-9 pb-8 lg:hidden">
-        <LogoMark className="h-11 w-[52px] shrink-0" />
-        <span className="text-[30px]/[34px] font-semibold tracking-[-0.035em] text-white">TrainPrompt</span>
-      </header>
+      {!desktop && (
+        <header className="flex flex-col bg-red">
+          <div className="flex items-center gap-3 px-6 pt-7">
+            <LogoMark className="h-8 w-[38px] shrink-0" />
+            <span className="text-[24px]/[28px] font-semibold tracking-[-0.035em] text-white">TrainPrompt</span>
+          </div>
+          <SignInIllustration crop={{ top: 64, height: 560 }} className="aspect-[720/560] max-h-[340px] w-full" />
+        </header>
+      )}
 
       <main className="flex flex-1 flex-col px-5 pt-8 pb-6 lg:w-1/2 lg:flex-none lg:px-14 lg:py-10">
         <a href="/" className="hidden self-start text-[20px]/[24px] font-semibold tracking-[-0.03em] lg:block">
@@ -28,10 +52,11 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         </p>
       </main>
 
-      <aside className="hidden flex-col items-center justify-center gap-9 bg-red lg:flex lg:w-1/2" aria-hidden>
-        <LogoMark className="h-[254px] w-[300px]" />
-        <span className="text-[64px]/[64px] font-semibold tracking-[-0.045em] text-white">TrainPrompt</span>
-      </aside>
+      {desktop && (
+        <aside className="sticky top-0 flex h-dvh w-1/2 bg-red">
+          <SignInIllustration className="flex-1" />
+        </aside>
+      )}
     </div>
   )
 }
