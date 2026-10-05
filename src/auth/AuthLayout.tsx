@@ -17,7 +17,15 @@ export function AuthLayout({ children }: { children: ReactNode }) {
         <div className="flex flex-1 flex-col lg:items-center lg:justify-center">
           <div className="mx-auto w-full max-w-[480px] lg:mx-0 lg:max-w-[400px]">{children}</div>
         </div>
-        <p className="hidden text-[13px]/[18px] text-muted lg:block">© 2026 TrainPrompt</p>
+        <p className="mx-auto flex w-full max-w-[480px] gap-5 pt-8 text-[13px]/[18px] text-muted lg:mx-0 lg:max-w-none lg:pt-0">
+          <span className="hidden lg:inline">© 2026 TrainPrompt</span>
+          <a href="/privacy" className="transition-colors hover:text-ink">
+            Privacy
+          </a>
+          <a href="/terms" className="transition-colors hover:text-ink">
+            Terms
+          </a>
+        </p>
       </main>
 
       <aside className="hidden flex-col items-center justify-center gap-9 bg-red lg:flex lg:w-1/2" aria-hidden>

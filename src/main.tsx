@@ -7,13 +7,21 @@ import App from './App.tsx'
 
 // The auth pages carry Clerk, so they load as their own chunk and the landing page stays light.
 const AuthApp = lazy(() => import('./auth/AuthApp.tsx'))
-const isAuthRoute = /^\/sign-(in|up)(\/|$)/.test(window.location.pathname)
+const LegalPage = lazy(() => import('./legal/LegalPage.tsx'))
+
+const path = window.location.pathname.replace(/\/+$/, '')
+const isAuthRoute = /^\/sign-(in|up)(\/|$)/.test(path)
+const legalDoc = path === '/privacy' ? 'privacy' : path === '/terms' ? 'terms' : null
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     {isAuthRoute ? (
       <Suspense fallback={null}>
         <AuthApp />
+      </Suspense>
+    ) : legalDoc ? (
+      <Suspense fallback={null}>
+        <LegalPage doc={legalDoc} />
       </Suspense>
     ) : (
       <App />
